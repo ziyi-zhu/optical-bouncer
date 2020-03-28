@@ -1,0 +1,23 @@
+{
+  "name": "optical-bouncer",
+  "version": "1.0.0",
+  "description": "A simple augmented reality game made with Matter.js and OpenCV.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ziyi-zhu/optical-bouncer.git"
+  },
+  "author": "Ziyi Zhu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ziyi-zhu/optical-bouncer/issues"
+  },
+  "homepage": "https://github.com/ziyi-zhu/optical-bouncer#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "matter-js": "^0.14.2"
+  }
+}

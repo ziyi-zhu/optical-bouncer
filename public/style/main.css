@@ -1,0 +1,31 @@
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -2;
+}
+
+#video {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#canvasOutput {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  opacity: 10%;
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+  -moz-transform:rotateY(180deg); /* Firefox */
+  /*Mirror code ends*/
+}
+
+#dot {
+  display: none;
+  width: 100%;
+}
