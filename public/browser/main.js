@@ -107,7 +107,7 @@ bodyB.restitution = 1;
 const video = document.getElementById('video');
 const actionBtn = document.getElementById('actionBtn');
 const videoBtn = document.getElementById('videoBtn');
-const FPS = 30;
+const FPS = 24;
 
 let stream;
 let streaming = false;
@@ -137,7 +137,7 @@ function onOpenCvReady() {
         videoMode = 1;
         canvasOutput.style.height = '225px';
         canvasOutput.style.width = '300px';
-        canvasOutput.style.opacity = '100%';
+        canvasOutput.style.opacity = '1';
         videoBtn.innerHTML = 'Background video: Window';
         break;
       case 1:
@@ -150,7 +150,7 @@ function onOpenCvReady() {
         canvasOutput.style.display = 'block';
         canvasOutput.style.height = '100%';
         canvasOutput.style.width = '100%';
-        canvasOutput.style.opacity = '5%';
+        canvasOutput.style.opacity = '0.05';
         videoBtn.innerHTML = 'Background video: Full';
         break;
     }
