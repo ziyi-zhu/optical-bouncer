@@ -33,6 +33,7 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies;
     Body = Matter.Body;
     Events = Matter.Events;
+    Common = Matter.Common;
 
 const windowWidth = document.documentElement.clientWidth;
 const windowHeight = document.documentElement.clientHeight;
@@ -78,42 +79,108 @@ Engine.run(engine);
 // run the renderer
 Render.run(render);
 
-let avgX = windowWidth / 2;
-let avgY = windowHeight / 2;
+let avgX = 0;
+let avgY = 0;
 
 let colliding = false;
 
 // create two boxes and a ground
-var bodyA = Bodies.circle(-windowWidth / 2, 0, 40, {
-  render: { fillStyle: '#0496ff' } 
+var ball = Bodies.circle(-windowWidth / 2, 0, 30, {
+  render: { sprite: { texture: 'public/images/football.png' } },
+  friction: 0.1
 });
-var bodyB = Bodies.trapezoid(windowWidth / 2, windowHeight / 2 + 150, 100, 40, 1, {
+var player = Bodies.trapezoid(windowWidth / 2, windowHeight / 2 + 150, 150, 40, 1, {
   isStatic: true,
-  render: { fillStyle: '#d81159' } 
+  render: { sprite: { texture: 'public/images/sneaker.png' } },
 });
-var bodyC = Bodies.circle(windowWidth / 2, windowHeight / 2 - 150, 40, {
+var target = Bodies.circle(windowWidth / 2, windowHeight / 2 - 150, 30, {
   isSensor: true,
   isStatic: true,
-  render: { fillStyle: '#ffbc42' } 
+  render: { sprite: { texture: 'public/images/goal.png' } },
+});
+var bomb = Bodies.circle(-windowWidth / 2, 0, 30, {
+  isSensor: true,
+  isStatic: true,
+  render: { sprite: { texture: 'public/images/bomb.png' } },
 });
 var ground = Bodies.rectangle(windowWidth / 2, windowHeight - 50, windowWidth * 2, 60, {
   isStatic: true,
   render: { fillStyle: '#2e2b44' } 
 });
 
-bodyA.restitution = 1;
-bodyB.restitution = 1;
+ball.restitution = 1;
+player.restitution = 1;
 
 const video = document.getElementById('video');
-const actionBtn = document.getElementById('actionBtn');
-const videoBtn = document.getElementById('videoBtn');
+const actionButton = document.getElementById('actionButton');
+const videoButton = document.getElementById('videoButton');
 const FPS = 24;
+let begin = Date.now();
 
 let stream;
 let streaming = false;
 
 let videoMode = 0;
 let score = 0;
+
+let hue = 165;
+let saturation = 204;
+let value = 128;
+
+function Sound(src) {
+  this.sound = document.createElement("audio");
+  this.sound.src = src;
+  this.sound.setAttribute("preload", "auto");
+  this.sound.setAttribute("controls", "none");
+  this.sound.style.display = "none";
+  document.body.appendChild(this.sound);
+  this.play = function(){
+    this.sound.play();
+  }
+  this.stop = function(){
+    this.sound.pause();
+  }
+}
+
+let correctSound = new Sound('public/sounds/correct.wav');
+let kickSound = new Sound('public/sounds/kick.wav');
+let failSound = new Sound('public/sounds/fail.wav');
+
+function changeHue(newValue) {
+  hue = parseInt(newValue * 1.8);
+  updateColor();
+}
+
+function changeSaturation(newValue) {
+  saturation = parseInt(newValue * 2.55);
+  updateColor();
+}
+
+function changeValue(newValue) {
+  value = parseInt(newValue * 2.55);
+  updateColor();
+}
+
+function updateColor() {
+  document.getElementById('color').style.fill = `hsl(${hue * 2},${saturation / 2.55}%,${value / 2.55}%)`;
+  document.getElementById('colorCurrent').style.fill = `hsl(${hue * 2},${saturation / 2.55}%,${value / 2.55}%)`;
+}
+
+function resetGame() {
+  Body.setPosition(ball, { x: windowWidth / 2, y: 100 });
+  Body.setVelocity(ball, { x: 0, y: 0 });
+  Body.setPosition(target, { x: windowWidth / 2, y: windowHeight / 2 - 150 });
+
+  avgX = windowWidth / 2;
+  avgY = windowHeight / 2 + 150;
+}
+
+function gameOver() {
+  document.getElementById('score').innerHTML = 'Score';
+  document.getElementById('heading').innerHTML = `Final Score: ${score}`;
+  document.getElementById('status').innerHTML = 'Try again.';
+  score = 0;
+}
 
 function onOpenCvReady() {
   document.getElementById('status').innerHTML = 'Game is ready.';
@@ -122,7 +189,7 @@ function onOpenCvReady() {
   let hsv;
   const cap = new cv.VideoCapture(video);
 
-  actionBtn.addEventListener('click', () => {
+  actionButton.addEventListener('click', () => {
     if (streaming) {
       stop();
     } else {
@@ -130,20 +197,20 @@ function onOpenCvReady() {
     }
   });
 
-  videoBtn.addEventListener('click', () => {
+  videoButton.addEventListener('click', () => {
     let canvasOutput = document.getElementById('canvasOutput');
     switch (videoMode) {
       case 0:
         videoMode = 1;
-        canvasOutput.style.height = '225px';
-        canvasOutput.style.width = '300px';
+        canvasOutput.style.height = '192px';
+        canvasOutput.style.width = '256px';
         canvasOutput.style.opacity = '1';
-        videoBtn.innerHTML = 'Background video: Window';
+        videoButton.innerHTML = 'Background video: Window';
         break;
       case 1:
         videoMode = 2;
         canvasOutput.style.display = 'none';
-        videoBtn.innerHTML = 'Background video: Off';
+        videoButton.innerHTML = 'Background video: Off';
         break;
       case 2:
         videoMode = 0;
@@ -151,14 +218,19 @@ function onOpenCvReady() {
         canvasOutput.style.height = '100%';
         canvasOutput.style.width = '100%';
         canvasOutput.style.opacity = '0.05';
-        videoBtn.innerHTML = 'Background video: Full';
+        videoButton.innerHTML = 'Background video: Full';
         break;
     }
   });
 
-  Events.on(engine, 'beforeUpdate', function(event) {
+  Events.on(engine, 'beforeUpdate', function(event) { 
+    if (streaming && (Date.now() - begin) > 1000 / FPS) {
+      processVideo();
+      Body.setPosition(player, { x: avgX, y: avgY });
+      begin = Date.now();
+    }
     if (colliding) {
-      Body.applyForce(bodyA, { x: bodyA.position.x, y: bodyA.position.y }, {x: 0, y: -0.1});
+      Body.applyForce(ball, { x: ball.position.x, y: ball.position.y }, {x: 0, y: -0.05});
       colliding = false;
     }
   });
@@ -171,22 +243,32 @@ function onOpenCvReady() {
     for (var i = 0; i < pairs.length; i++) {
       var pair = pairs[i];
 
-      if (pair.bodyA.id == 1 || pair.bodyB.id == 1) {
-        colliding = true;
+      if (pair.bodyA === ball || pair.bodyB === ball) {
         if (streaming) {
-          if (pair.bodyA.id == 3 || pair.bodyB.id == 3) {
-            colliding = false;
+          if (pair.bodyA === target || pair.bodyB === target) {
+            correctSound.play();
             score++;
             document.getElementById('score').innerHTML = `Score: ${score}`;
-            Body.setPosition(bodyC, {
-              x: Math.floor(Math.random() * windowWidth / 2 + windowWidth / 4),
-              y: Math.floor(Math.random() * windowHeight / 2 + windowHeight / 4),
+            let randX = Common.random(windowWidth * 0.3, windowWidth * 0.7);
+            let randY = Common.random(windowHeight * 0.3, windowHeight * 0.5);
+            Body.setPosition(target, {
+              x: randX,
+              y: randY
             });
-          } else if (pair.bodyA.id == 4 || pair.bodyB.id == 4) {
-            document.getElementById('score').innerHTML = 'Score';
-            document.getElementById('heading').innerHTML = `Final Score: ${score}`;
-            document.getElementById('status').innerHTML = 'Try again.';
-            score = 0;
+            Body.setPosition(bomb, {
+              x: randX + Common.random(windowWidth * 0.1, windowWidth * 0.3) * Common.choose([-1, 1]),
+              y: randY + Common.random(windowHeight * 0.1, windowHeight * 0.3) * Common.choose([-1, 1])
+            });
+          } else if (pair.bodyA === player || pair.bodyB === player) {
+            colliding = true;
+            kickSound.play();
+          } else if (pair.bodyA === ground || pair.bodyB === ground) {
+            gameOver();
+            failSound.play();
+            stop();
+          } else if (pair.bodyA === bomb || pair.bodyB === bomb) {
+            gameOver();
+            failSound.play();
             stop();
           }
         }
@@ -195,14 +277,16 @@ function onOpenCvReady() {
   });
 
   // add all of the bodies to the world
-  World.add(engine.world, [bodyA, bodyB, bodyC, ground]);
+  World.add(engine.world, [ball, player, target, bomb, ground]);
 
-  // document.body.addEventListener('click', (event) => {
-  //   Body.setPosition(bodyA, { x: windowWidth / 2, y: 0 });
-  //   Body.setVelocity(bodyA, { x: 0, y: 0 });
-  // });
+  World.add(engine.world, [
+    // walls
+    Bodies.rectangle(windowWidth / 2, - 25, windowWidth, 50, { isStatic: true }),
+    Bodies.rectangle(windowWidth + 25, windowHeight / 2, 50, windowHeight, { isStatic: true }),
+    Bodies.rectangle(-25, windowHeight / 2, 50, windowHeight, { isStatic: true })
+  ]);
 
-  function start () {
+  function start() {
     document.getElementById('main').style.display = 'none';
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(_stream => {
@@ -210,19 +294,15 @@ function onOpenCvReady() {
       video.srcObject = stream;
       video.play();
       streaming = true;
-      src = new cv.Mat(225, 300, cv.CV_8UC4);
+      src = new cv.Mat(72, 96, cv.CV_8UC4);
       dst = new cv.Mat();
       hsv = new cv.Mat();
-      setTimeout(processVideo, 0)
-
-      Body.setPosition(bodyA, { x: windowWidth / 2, y: 0 });
-      Body.setVelocity(bodyA, { x: 0, y: 0 });
-      Body.setPosition(bodyC, { x: windowWidth / 2, y: windowHeight / 2 - 150 });
+      resetGame();
     })
     .catch(err => console.log(`An error occurred: ${err}`));
   }
 
-  function stop () {
+  function stop() {
     document.getElementById('main').style.display = 'block';
     if (video) {
       video.pause();
@@ -232,22 +312,17 @@ function onOpenCvReady() {
       stream.getVideoTracks()[0].stop();
     }
     streaming = false;
+    src.delete();
+    dst.delete();
+    hsv.delete();
   }
 
-  function processVideo () {
-    if (!streaming) {
-      src.delete();
-      dst.delete();
-      hsv.delete();
-      return;
-    }
-    const begin = Date.now();
-
+  function processVideo() {
     cap.read(src)
 
     cv.cvtColor(src, hsv, cv.COLOR_RGB2HSV);
-    let low = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [150, 20, 180, 0]);
-    let high = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [180, 255, 255, 255]);
+    let low = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [hue - 15, saturation - 50, value, 0]);
+    let high = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [hue + 15, 255, 255, 255]);
     cv.inRange(hsv, low, high, dst);
 
     let sumX = 0;
@@ -263,18 +338,11 @@ function onOpenCvReady() {
         }
       }
     }
-
     if (count != 0) {
       avgX = windowWidth - parseInt(sumX / count * windowWidth / dst.cols);
       avgY = parseInt(sumY / count * windowHeight / dst.rows);
     }
-
-    Body.setPosition(bodyB, { x: avgX, y: avgY });
-
     cv.imshow('canvasOutput', dst);
-
-    const delay = 1000 / FPS - (Date.now() - begin);
-    setTimeout(processVideo, delay);
 
     low.delete();
     high.delete();

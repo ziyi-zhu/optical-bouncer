@@ -44,7 +44,12 @@
             <a class="nav-link disabled" href="#" id="score">Score</a>
             <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Features</a>
             <div class="dropdown-menu" aria-labelledby="dropdown05">
-              <a class="dropdown-item" href="#" id="videoBtn">Background video: Full</a>
+              <a class="dropdown-item" href="#" id="videoButton">Background video: Full</a>
+              <a class="dropdown-item" href="#" id="colorButton" data-toggle="modal" data-target="#colorModal">Target color: 
+                <svg width="15" height="15">
+                  <rect width="15" height="15" id="colorCurrent" style="fill: hsl(330, 80%, 50%);" />
+                </svg>
+              </a>
             </div>
           </nav>
         </div>
@@ -57,10 +62,10 @@
           <h1 class="cover-heading" id="heading">Welcome to Optical Bouncer</h1>
           <p class="lead" id="status">Game is loading...</p>
           <p class="lead">
-            <a href="#" class="btn btn-lg btn-secondary" id="actionBtn">Start</a>
+            <a href="#" class="btn btn-lg btn-secondary" id="actionButton">Start</a>
           </p>
         </div>
-        <video id="video" width="300" height="225" style="display: none;"></video>
+        <video id="video" width="96" height="72" style="display: none;"></video>
         <canvas id="canvasOutput"></canvas>
       </main>
 
@@ -69,6 +74,37 @@
           <p>© Ziyi Zhu 2020. All rights reserved.</p>
         </div>
       </footer>
+
+      <!-- Modal -->
+      <div class="modal fade" id="colorModal" tabindex="-1" role="dialog" aria-labelledby="colorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="colorModalLabel">Color settings</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <fieldset class="form-group">
+                  <label for="hue">Hue</label>
+                  <input type="range" class="custom-range" id="hue" value ="92" onchange="changeHue(this.value)">
+                  <label for="saturation">Saturation</label>
+                  <input type="range" class="custom-range" id="saturation" value ="80" onchange="changeSaturation(this.value)">
+                  <label for="value">Value</label>
+                  <input type="range" class="custom-range" id="value" value ="50" onchange="changeValue(this.value)">
+                </fieldset>
+                <svg width="50" height="50">
+                  <rect width="50" height="50" id="color" style="fill: hsl(330, 80%, 50%);" />
+                </svg>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Optional JavaScript -->

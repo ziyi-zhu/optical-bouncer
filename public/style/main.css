@@ -29,3 +29,25 @@
   display: none;
   width: 100%;
 }
+
+.nav-masthead .dropdown-item {
+  text-shadow: none;
+  font-weight: 300;
+}
+
+/*
+ * Modal
+ */
+.modal {
+  padding: 0 1.5rem;
+}
+.modal .btn {
+  padding: .75rem 1.25rem;
+  font-weight: 700;
+}
+.modal-content {
+   background-color: #333;
+}
+.modal .close {
+  color: #fff;
+}
