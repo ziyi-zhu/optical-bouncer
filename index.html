@@ -45,7 +45,7 @@
             <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Features</a>
             <div class="dropdown-menu" aria-labelledby="dropdown05">
               <a class="dropdown-item" href="#" id="videoButton">Background video: Full</a>
-              <a class="dropdown-item" href="#" id="colorButton" data-toggle="modal" data-target="#colorModal">Target color: 
+              <a class="dropdown-item" href="#" id="colorButton" data-toggle="modal" data-target="#colorModal">Current color: 
                 <svg width="15" height="15">
                   <rect width="15" height="15" id="colorCurrent" style="fill: hsl(330, 80%, 50%);" />
                 </svg>
@@ -98,9 +98,33 @@
                 <svg width="50" height="50">
                   <rect width="50" height="50" id="color" style="fill: hsl(330, 80%, 50%);" />
                 </svg>
+              </form>
+            </div>
+            <div class="modal-footer"
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="tutorialModalLabel">Welcome to Optical Bouncer</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <h5 id="tutorialBody">This short tutorial will walk you through all of the features of this application.</h5>
+              <br>
+              <img id="tutorialImage" src="public/images/flame.png" width="50%">
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" id="previousButton">Previous</button>
+              <button type="button" class="btn btn-secondary" id="nextButton">Next</button>
             </div>
           </div>
         </div>

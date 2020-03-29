@@ -128,11 +128,11 @@ let saturation = 204;
 let value = 128;
 
 function Sound(src) {
-  this.sound = document.createElement("audio");
+  this.sound = document.createElement('audio');
   this.sound.src = src;
-  this.sound.setAttribute("preload", "auto");
-  this.sound.setAttribute("controls", "none");
-  this.sound.style.display = "none";
+  this.sound.setAttribute('preload', 'auto');
+  this.sound.setAttribute('controls', 'none');
+  this.sound.style.display = 'none';
   document.body.appendChild(this.sound);
   this.play = function(){
     this.sound.play();
@@ -145,6 +145,7 @@ function Sound(src) {
 let correctSound = new Sound('public/sounds/correct.wav');
 let kickSound = new Sound('public/sounds/kick.wav');
 let failSound = new Sound('public/sounds/fail.wav');
+let explodeSound = new Sound('public/sounds/explode.wav');
 
 function changeHue(newValue) {
   hue = parseInt(newValue * 1.8);
@@ -170,9 +171,12 @@ function resetGame() {
   Body.setPosition(ball, { x: windowWidth / 2, y: 100 });
   Body.setVelocity(ball, { x: 0, y: 0 });
   Body.setPosition(target, { x: windowWidth / 2, y: windowHeight / 2 - 150 });
+  Body.setPosition(bomb, { x: -windowWidth / 2, y: 0 });
 
   avgX = windowWidth / 2;
   avgY = windowHeight / 2 + 150;
+
+  bomb.render.sprite.texture = 'public/images/bomb.png';
 }
 
 function gameOver() {
@@ -267,8 +271,9 @@ function onOpenCvReady() {
             failSound.play();
             stop();
           } else if (pair.bodyA === bomb || pair.bodyB === bomb) {
+            bomb.render.sprite.texture = 'public/images/flame.png';
             gameOver();
-            failSound.play();
+            explodeSound.play();
             stop();
           }
         }
