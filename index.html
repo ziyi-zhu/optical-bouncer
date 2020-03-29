@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="shortcut icon" href="public/images/dot.png"/>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
@@ -39,8 +41,11 @@
           <h3 class="masthead-brand">Optical Bouncer</h3>
           <nav class="nav nav-masthead justify-content-center">
             <a class="nav-link active" href="https://ziyizhu.me">Home</a>
-            <a class="nav-link" href="#">Features</a>
-            <a class="nav-link" href="#">Contact</a>
+            <a class="nav-link disabled" href="#" id="score">Score</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Features</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown05">
+              <a class="dropdown-item" href="#" id="videoBtn">Background video: Full</a>
+            </div>
           </nav>
         </div>
       </header>
@@ -49,14 +54,14 @@
         <img src="public/images/dot.png" alt="Dot" id="dot">
         <canvas id="canvas"></canvas>
         <div id="main">
-          <h1 class="cover-heading">Welcome to Optical Bouncer</h1>
-          <p class=""lead" id="status">Game is loading...</p>
+          <h1 class="cover-heading" id="heading">Welcome to Optical Bouncer</h1>
+          <p class="lead" id="status">Game is loading...</p>
           <p class="lead">
             <a href="#" class="btn btn-lg btn-secondary" id="actionBtn">Start</a>
           </p>
-          <video id="video" width="300" height="225" style="display: none;"></video>
-          <canvas id="canvasOutput"></canvas>
         </div>
+        <video id="video" width="300" height="225" style="display: none;"></video>
+        <canvas id="canvasOutput"></canvas>
       </main>
 
       <footer class="mastfoot mt-auto">
@@ -71,9 +76,9 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
     <script src="https://docs.opencv.org/master/utils.js" type="text/javascript"></script>
     <script src="public/browser/matter.js" type="text/javascript"></script>
     <script src="public/browser/main.js" type="text/javascript"></script>
+    <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
   </body>
 </html>

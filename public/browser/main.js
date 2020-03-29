@@ -23,7 +23,7 @@ if (isMobile.any()) {
   document.getElementById('dot').style.display = 'block';
   document.getElementById('main').style.display = 'none';
   document.getElementById('canvas').style.display = 'none';
-  document.body.style.background = "#333"
+  document.body.style.background = '#333'
 }
 
 // module aliases
@@ -50,7 +50,7 @@ var render = Render.create({
     pixelRatio: 1,
     background: '#333',
     wireframeBackground: '#333',
-    hasBounds: false,
+    hasBounds: true,
     enabled: true,
     wireframes: false,
     showSleeping: true,
@@ -72,40 +72,11 @@ var render = Render.create({
   }
 });
 
-// add mouse control
-let world = engine.world;
-  let Mouse = Matter.Mouse;
-  let MouseConstraint = Matter.MouseConstraint;
-  let mouse = Mouse.create(render.canvas),
-      mouseConstraint = MouseConstraint.create(engine, {
-        mouse: mouse,
-        constraint: {
-          stiffness: 0.2,
-          render: {
-            visible: false
-          }
-        }
-      });
-
-World.add(world, mouseConstraint);
-
 // run the engine
 Engine.run(engine);
 
 // run the renderer
 Render.run(render);
-
-function onCvLoaded () {
-  console.log('cv', cv);
-  cv.onRuntimeInitialized = onReady;
-}
-
-const video = document.getElementById('video');
-const actionBtn = document.getElementById('actionBtn');
-const FPS = 30;
-
-let stream;
-let streaming = false;
 
 let avgX = windowWidth / 2;
 let avgY = windowHeight / 2;
@@ -116,17 +87,33 @@ let colliding = false;
 var bodyA = Bodies.circle(-windowWidth / 2, 0, 40, {
   render: { fillStyle: '#0496ff' } 
 });
-var bodyB = Bodies.trapezoid(windowWidth / 2, windowHeight / 2 + 150, 200, 40, 1, {
+var bodyB = Bodies.trapezoid(windowWidth / 2, windowHeight / 2 + 150, 100, 40, 1, {
   isStatic: true,
   render: { fillStyle: '#d81159' } 
 });
-var ground = Bodies.rectangle(windowWidth / 2, windowHeight - 50, windowWidth, 60, {
+var bodyC = Bodies.circle(windowWidth / 2, windowHeight / 2 - 150, 40, {
+  isSensor: true,
+  isStatic: true,
+  render: { fillStyle: '#ffbc42' } 
+});
+var ground = Bodies.rectangle(windowWidth / 2, windowHeight - 50, windowWidth * 2, 60, {
   isStatic: true,
   render: { fillStyle: '#2e2b44' } 
 });
 
 bodyA.restitution = 1;
 bodyB.restitution = 1;
+
+const video = document.getElementById('video');
+const actionBtn = document.getElementById('actionBtn');
+const videoBtn = document.getElementById('videoBtn');
+const FPS = 30;
+
+let stream;
+let streaming = false;
+
+let videoMode = 0;
+let score = 0;
 
 function onOpenCvReady() {
   document.getElementById('status').innerHTML = 'Game is ready.';
@@ -138,10 +125,34 @@ function onOpenCvReady() {
   actionBtn.addEventListener('click', () => {
     if (streaming) {
       stop();
-      actionBtn.textContent = 'Start';
     } else {
       start();
-      actionBtn.textContent = 'Stop';
+    }
+  });
+
+  videoBtn.addEventListener('click', () => {
+    let canvasOutput = document.getElementById('canvasOutput');
+    switch (videoMode) {
+      case 0:
+        videoMode = 1;
+        canvasOutput.style.height = '225px';
+        canvasOutput.style.width = '300px';
+        canvasOutput.style.opacity = '100%';
+        videoBtn.innerHTML = 'Background video: Window';
+        break;
+      case 1:
+        videoMode = 2;
+        canvasOutput.style.display = 'none';
+        videoBtn.innerHTML = 'Background video: Off';
+        break;
+      case 2:
+        videoMode = 0;
+        canvasOutput.style.display = 'block';
+        canvasOutput.style.height = '100%';
+        canvasOutput.style.width = '100%';
+        canvasOutput.style.opacity = '5%';
+        videoBtn.innerHTML = 'Background video: Full';
+        break;
     }
   });
 
@@ -160,25 +171,42 @@ function onOpenCvReady() {
     for (var i = 0; i < pairs.length; i++) {
       var pair = pairs[i];
 
-      if (!pair.bodyA.isStatic || !pair.bodyB.isStatic) {
+      if (pair.bodyA.id == 1 || pair.bodyB.id == 1) {
         colliding = true;
+        if (streaming) {
+          if (pair.bodyA.id == 3 || pair.bodyB.id == 3) {
+            colliding = false;
+            score++;
+            document.getElementById('score').innerHTML = `Score: ${score}`;
+            Body.setPosition(bodyC, {
+              x: Math.floor(Math.random() * windowWidth / 2 + windowWidth / 4),
+              y: Math.floor(Math.random() * windowHeight / 2 + windowHeight / 4),
+            });
+          } else if (pair.bodyA.id == 4 || pair.bodyB.id == 4) {
+            document.getElementById('score').innerHTML = 'Score';
+            document.getElementById('heading').innerHTML = `Final Score: ${score}`;
+            document.getElementById('status').innerHTML = 'Try again.';
+            score = 0;
+            stop();
+          }
+        }
       }
     }
   });
 
   // add all of the bodies to the world
-  World.add(engine.world, [bodyA, bodyB, ground]);
+  World.add(engine.world, [bodyA, bodyB, bodyC, ground]);
 
-  document.body.addEventListener('click', (event) => {
-    Body.setPosition(bodyA, { x: windowWidth / 2, y: 0 });
-    Body.setVelocity(bodyA, { x: 0, y: 0 });
-  });
+  // document.body.addEventListener('click', (event) => {
+  //   Body.setPosition(bodyA, { x: windowWidth / 2, y: 0 });
+  //   Body.setVelocity(bodyA, { x: 0, y: 0 });
+  // });
 
   function start () {
+    document.getElementById('main').style.display = 'none';
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(_stream => {
       stream = _stream;
-      console.log('stream', stream);
       video.srcObject = stream;
       video.play();
       streaming = true;
@@ -186,11 +214,16 @@ function onOpenCvReady() {
       dst = new cv.Mat();
       hsv = new cv.Mat();
       setTimeout(processVideo, 0)
+
+      Body.setPosition(bodyA, { x: windowWidth / 2, y: 0 });
+      Body.setVelocity(bodyA, { x: 0, y: 0 });
+      Body.setPosition(bodyC, { x: windowWidth / 2, y: windowHeight / 2 - 150 });
     })
     .catch(err => console.log(`An error occurred: ${err}`));
   }
 
   function stop () {
+    document.getElementById('main').style.display = 'block';
     if (video) {
       video.pause();
       video.srcObject = null;
@@ -242,5 +275,8 @@ function onOpenCvReady() {
 
     const delay = 1000 / FPS - (Date.now() - begin);
     setTimeout(processVideo, delay);
+
+    low.delete();
+    high.delete();
   }
 }
