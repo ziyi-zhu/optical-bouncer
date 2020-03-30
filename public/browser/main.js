@@ -58,7 +58,7 @@ if (isMobile.any()) {
 var tutorialText = [
   'This short tutorial will walk you through all of the features of this application. If you want to dive right in, feel free to close the window.',
   'Go to page ziyizhu.me/optical-bouncer on any mobile devices and the following image should show up on the screen.',
-  'Hold your mobile device in front of your laptop with the image facing the webcam. Ensure good lighting for better result.',
+  'Hold your mobile device in front of your desktop with the image facing the webcam. Ensure good lighting for better result.',
   'Alternatively, choose any bright colored object and set the corresponding color in the "Features" menu for object detection.',
   'Click "Start" to enjoy the game and try to score as much as you can. Settings for background video can be changed in the "Features" menu.'
 ];
@@ -272,7 +272,7 @@ function onOpenCvReady() {
         canvasOutput.style.display = 'block';
         canvasOutput.style.height = '100%';
         canvasOutput.style.width = '100%';
-        canvasOutput.style.opacity = '0.05';
+        canvasOutput.style.opacity = '0.2';
         videoButton.innerHTML = 'Background video: Full';
         break;
     }
@@ -350,7 +350,7 @@ function onOpenCvReady() {
       video.srcObject = stream;
       video.play();
       streaming = true;
-      src = new cv.Mat(72, 96, cv.CV_8UC4);
+      src = new cv.Mat(720, 960, cv.CV_8UC4);
       dst = new cv.Mat();
       hsv = new cv.Mat();
       resetGame();
@@ -375,8 +375,12 @@ function onOpenCvReady() {
 
   function processVideo() {
     cap.read(src)
+    cv.imshow('canvasOutput', src);
 
-    cv.cvtColor(src, hsv, cv.COLOR_RGB2HSV);
+    let dsize = new cv.Size(96, 72);
+    cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
+
+    cv.cvtColor(dst, hsv, cv.COLOR_RGB2HSV);
     let low = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [hue - 15, saturation - 50, value, 0]);
     let high = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [hue + 15, 255, 255, 255]);
     cv.inRange(hsv, low, high, dst);
@@ -398,7 +402,6 @@ function onOpenCvReady() {
       avgX = windowWidth - parseInt(sumX / count * windowWidth / dst.cols);
       avgY = parseInt(sumY / count * windowHeight / dst.rows);
     }
-    cv.imshow('canvasOutput', dst);
 
     low.delete();
     high.delete();
