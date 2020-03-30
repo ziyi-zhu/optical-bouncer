@@ -25,9 +25,8 @@
   /*Mirror code ends*/
 }
 
-#dot {
+#mobile {
   display: none;
-  width: 100%;
 }
 
 .nav-masthead .dropdown-item {
@@ -46,7 +45,7 @@
   font-weight: 700;
 }
 .modal-content {
-   background-color: #333;
+  background-color: #333;
 }
 .modal .close {
   color: #fff;

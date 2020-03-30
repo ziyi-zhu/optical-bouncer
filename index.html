@@ -42,6 +42,7 @@
           <nav class="nav nav-masthead justify-content-center">
             <a class="nav-link active" href="https://ziyizhu.me">Home</a>
             <a class="nav-link disabled" href="#" id="score">Score</a>
+            <a class="nav-link" href="#"  data-toggle="modal" data-target="#tutorialModal">Tutorial</a>
             <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Features</a>
             <div class="dropdown-menu" aria-labelledby="dropdown05">
               <a class="dropdown-item" href="#" id="videoButton">Background video: Full</a>
@@ -56,7 +57,11 @@
       </header>
 
       <main role="main" class="inner cover">
-        <img src="public/images/dot.png" alt="Dot" id="dot">
+        <div id="mobile">
+          <p class="lead">Please visit this page on your desktop brwoser.</p>
+          <br>
+          <img src="public/images/dot.png" alt="Dot" id="dot" style="width: 100%;">
+        </div>
         <canvas id="canvas"></canvas>
         <div id="main">
           <h1 class="cover-heading" id="heading">Welcome to Optical Bouncer</h1>
@@ -88,11 +93,11 @@
             <div class="modal-body">
               <form>
                 <fieldset class="form-group">
-                  <label for="hue">Hue</label>
+                  <label class="lead" for="hue">Hue</label>
                   <input type="range" class="custom-range" id="hue" value ="92" onchange="changeHue(this.value)">
-                  <label for="saturation">Saturation</label>
+                  <label class="lead" for="saturation">Saturation</label>
                   <input type="range" class="custom-range" id="saturation" value ="80" onchange="changeSaturation(this.value)">
-                  <label for="value">Value</label>
+                  <label class="lead" for="value">Value</label>
                   <input type="range" class="custom-range" id="value" value ="50" onchange="changeValue(this.value)">
                 </fieldset>
                 <svg width="50" height="50">
@@ -100,7 +105,7 @@
                 </svg>
               </form>
             </div>
-            <div class="modal-footer"
+            <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -118,9 +123,9 @@
               </button>
             </div>
             <div class="modal-body">
-              <h5 id="tutorialBody">This short tutorial will walk you through all of the features of this application.</h5>
-              <br>
-              <img id="tutorialImage" src="public/images/flame.png" width="50%">
+              <p class="lead" id="tutorialBody">This short tutorial will walk you through all of the features of this application. If you want to dive right in, feel free to close the window.</p>
+              <img class="my-3" id="tutorialImage" src="public/images/dot.png" width="50%">
+              <p class="lead" id="tutorialPage">1/5</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" id="previousButton">Previous</button>

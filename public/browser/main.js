@@ -20,11 +20,58 @@ var isMobile = {
 };
 
 if (isMobile.any()) {
-  document.getElementById('dot').style.display = 'block';
+  document.getElementById('mobile').style.display = 'block';
   document.getElementById('main').style.display = 'none';
   document.getElementById('canvas').style.display = 'none';
   document.body.style.background = '#333'
+} else {
+  $('#tutorialModal').modal('show');
+  $('#nextButton').click(function() {
+    if (page == 0) {
+      $('#previousButton').removeClass('disabled');
+      $('#previousButton').prop("disabled", false);
+    }
+    page++;
+    $('#tutorialBody').text(tutorialText[page]);
+    $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
+    $('#tutorialImage').attr('src', tutorialImage[page]); 
+    if (page == tutorialText.length - 1) {
+      $('#nextButton').prop("disabled", true);
+    }
+  });
+
+  $('#previousButton').prop("disabled", true).click(function() {
+    if (page == tutorialText.length - 1) {
+      $('#nextButton').removeClass('disabled');
+      $('#nextButton').prop("disabled", false);
+    }
+    page--;
+    $('#tutorialBody').text(tutorialText[page]);
+    $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
+    $('#tutorialImage').attr('src', tutorialImage[page]); 
+    if (page == 0) {
+      $('#previousButton').prop("disabled", true);
+    }
+  });
 }
+
+var tutorialText = [
+  'This short tutorial will walk you through all of the features of this application. If you want to dive right in, feel free to close the window.',
+  'Go to page ziyizhu.me/optical-bouncer on any mobile devices and the following image should show up on the screen.',
+  'Hold your mobile device in front of your laptop with the image facing the webcam. Ensure good lighting for better result.',
+  'Alternatively, choose any bright colored object and set the corresponding color in the "Features" menu for object detection.',
+  'Click "Start" to enjoy the game and try to score as much as you can. Settings for background video can be changed in the "Features" menu.'
+];
+
+var tutorialImage = [
+  'public/images/dot.png',
+  'public/images/phone.png',
+  'public/images/desktop.png',
+  'public/images/object.png',
+  'public/images/game.png'
+];
+
+var page = 0;
 
 // module aliases
 var Engine = Matter.Engine,
@@ -114,6 +161,9 @@ player.restitution = 1;
 const video = document.getElementById('video');
 const actionButton = document.getElementById('actionButton');
 const videoButton = document.getElementById('videoButton');
+const nextButton = document.getElementById('nextButton');
+const previousButton = document.getElementById('previousButton');
+
 const FPS = 24;
 let begin = Date.now();
 
@@ -188,6 +238,7 @@ function gameOver() {
 
 function onOpenCvReady() {
   document.getElementById('status').innerHTML = 'Game is ready.';
+
   let src;
   let dst;
   let hsv;
