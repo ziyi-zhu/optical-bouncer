@@ -26,34 +26,35 @@ if (isMobile.any()) {
   document.body.style.background = '#333'
 } else {
   $('#tutorialModal').modal('show');
-  $('#nextButton').click(function() {
-    if (page == 0) {
-      $('#previousButton').removeClass('disabled');
-      $('#previousButton').prop("disabled", false);
-    }
-    page++;
-    $('#tutorialBody').text(tutorialText[page]);
-    $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
-    $('#tutorialImage').attr('src', tutorialImage[page]); 
-    if (page == tutorialText.length - 1) {
-      $('#nextButton').prop("disabled", true);
-    }
-  });
-
-  $('#previousButton').prop("disabled", true).click(function() {
-    if (page == tutorialText.length - 1) {
-      $('#nextButton').removeClass('disabled');
-      $('#nextButton').prop("disabled", false);
-    }
-    page--;
-    $('#tutorialBody').text(tutorialText[page]);
-    $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
-    $('#tutorialImage').attr('src', tutorialImage[page]); 
-    if (page == 0) {
-      $('#previousButton').prop("disabled", true);
-    }
-  });
 }
+
+$('#nextButton').click(function() {
+  if (page == 0) {
+    $('#previousButton').removeClass('disabled');
+    $('#previousButton').prop("disabled", false);
+  }
+  page++;
+  $('#tutorialBody').text(tutorialText[page]);
+  $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
+  $('#tutorialImage').attr('src', tutorialImage[page]); 
+  if (page == tutorialText.length - 1) {
+    $('#nextButton').prop("disabled", true);
+  }
+});
+
+$('#previousButton').prop("disabled", true).click(function() {
+  if (page == tutorialText.length - 1) {
+    $('#nextButton').removeClass('disabled');
+    $('#nextButton').prop("disabled", false);
+  }
+  page--;
+  $('#tutorialBody').text(tutorialText[page]);
+  $('#tutorialPage').text(`${page + 1}/${tutorialText.length}`);
+  $('#tutorialImage').attr('src', tutorialImage[page]); 
+  if (page == 0) {
+    $('#previousButton').prop("disabled", true);
+  }
+});
 
 var tutorialText = [
   'This short tutorial will walk you through all of the features of this application. If you want to dive right in, feel free to close the window.',
